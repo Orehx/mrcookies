@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mr Cookies — собери свой кукис</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;600;800&display=swap&subset=cyrillic" rel="stylesheet">
+<style>
+:root{
+  --bg:#CFE2FF; --surface:#FFFFFF; --soft:#EAF2FF; --ink:#3A1E12; --muted:#7A5A4B;
+  --dough:#E3A55A; --dough-edge:#C47F38; --pink:#FF5C93; --pink-ink:#FFFFFF;
+  --line:#3A1E12; --shadow:4px 4px 0 var(--line);
+  --display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1B1222; --surface:#2A1C30; --soft:#352540; --ink:#FFE8D6; --muted:#C9AFA0;
+    --pink:#FF7AA8; --pink-ink:#2A0F1A; --line:#FFE8D6;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1B1222; --surface:#2A1C30; --soft:#352540; --ink:#FFE8D6; --muted:#C9AFA0;
+  --pink:#FF7AA8; --pink-ink:#2A0F1A; --line:#FFE8D6;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img,svg{max-width:100%}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--pink);outline-offset:3px}
+
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+
+/* hero */
+.hero{padding:36px 0 12px}
+.brand{display:flex;align-items:center;gap:12px;font-family:var(--display);font-weight:700;font-size:15px;text-decoration:none}
+.brand .dot{width:30px;height:30px;border-radius:50%;background:var(--dough);border:2px solid var(--line);position:relative}
+.brand .dot::after{content:"";position:absolute;inset:7px 9px 11px 8px;border-radius:50%;background:var(--ink);box-shadow:8px 6px 0 -2px var(--ink)}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(44px,9vw,104px);line-height:.92;letter-spacing:-.03em;margin:28px 0 14px}
+.lede{font-size:clamp(18px,2.2vw,21px);max-width:34ch;margin:0;color:var(--muted)}
+
+/* builder layout */
+.builder{display:grid;grid-template-columns:1fr;gap:24px;padding:28px 0 40px}
+@media (min-width:900px){.builder{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:44px;align-items:start}}
+.stage{position:relative;background:var(--surface);border:2px solid var(--line);border-radius:32px;box-shadow:var(--shadow);padding:18px;display:flex;flex-direction:column;align-items:center}
+@media (min-width:900px){.stage{position:sticky;top:calc(env(safe-area-inset-top,0px) + 20px)}}
+.plate{width:100%;max-width:400px;aspect-ratio:1;border-radius:50%;background:var(--soft);display:grid;place-items:center}
+#cookie{width:100%;height:100%;overflow:visible}
+#cookie .c{transform-origin:130px 130px}
+#cookie .c.pop{animation:pop .38s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{0%{transform:scale(.92)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){#cookie .c.pop{animation:none}html{scroll-behavior:auto}}
+.stage-meta{display:flex;justify-content:space-between;align-items:baseline;width:100%;margin-top:14px;gap:12px}
+.stage-meta .nm{font-family:var(--display);font-weight:700;font-size:20px}
+.stage-meta .wt{color:var(--muted);font-size:15px}
+
+.steps{display:flex;flex-direction:column;gap:30px}
+.step h2{font-family:var(--display);font-weight:700;font-size:24px;margin:0 0 4px;display:flex;gap:12px;align-items:center}
+.step h2 .n{flex:none;width:34px;height:34px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-size:16px}
+.step .hint{color:var(--muted);margin:0 0 14px;font-size:15px}
+.group-title{font-weight:800;margin:20px 0 10px;font-size:16px}
+
+.sizes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.size{background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:14px 10px 12px;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
+.size[aria-pressed="true"]{background:var(--pink);color:var(--pink-ink);box-shadow:var(--shadow);transform:translate(-2px,-2px)}
+.size .sz{font-family:var(--display);font-weight:700;font-size:17px}
+.size .g{font-size:14px;opacity:.8}
+.size .pr{font-weight:800;font-size:18px;margin-top:6px}
+.size s{opacity:.55;font-weight:600;font-size:14px;margin-right:4px}
+
+.addons{display:flex;flex-direction:column;gap:8px}
+.addon{background:var(--surface);border:2px solid var(--line);border-radius:18px;overflow:hidden}
+.addon.on{box-shadow:var(--shadow)}
+.addon-btn{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;cursor:pointer}
+.addon-btn:focus-visible{outline:3px solid var(--pink);outline-offset:-3px;border-radius:16px}
+.sw{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--line)}
+.addon-txt{flex:1;min-width:0}
+.addon-txt b{display:block;font-weight:800}
+.addon-txt span{font-size:14px;color:var(--muted)}
+.tick{flex:none;width:26px;height:26px;border-radius:8px;border:2px solid var(--line);display:grid;place-items:center;font-weight:800}
+.addon.on .tick{background:var(--pink);color:var(--pink-ink)}
+.place{display:none;gap:6px;padding:0 14px 14px;flex-wrap:wrap}
+.addon.on .place{display:flex}
+.place button{border:2px solid var(--line);background:transparent;border-radius:999px;padding:5px 14px;font-size:14px;font-weight:600;cursor:pointer}
+.place button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+
+.qty{display:inline-flex;align-items:center;border:2px solid var(--line);border-radius:999px;background:var(--surface)}
+.qty button{width:46px;height:46px;border:0;background:transparent;font-size:22px;font-weight:800;cursor:pointer;border-radius:999px}
+.qty output{min-width:40px;text-align:center;font-family:var(--display);font-weight:700;font-size:20px}
+
+/* order */
+.order{background:var(--surface);border:2px solid var(--line);border-radius:28px;box-shadow:var(--shadow);padding:22px}
+.order pre{white-space:pre-wrap;font-family:var(--body);font-size:16px;background:var(--soft);border-radius:16px;padding:14px 16px;margin:0 0 16px;overflow-x:auto}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:2px solid var(--line);border-radius:999px;padding:13px 22px;font-weight:800;font-size:16px;text-decoration:none;cursor:pointer;background:var(--surface)}
+.btn.main{background:var(--pink);color:var(--pink-ink);box-shadow:var(--shadow)}
+.btn.main:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--line)}
+.note{font-size:14px;color:var(--muted);margin:12px 0 0}
+
+/* sticky total */
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:2px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:10}
+.bar .sum{font-family:var(--display);font-weight:700;font-size:22px}
+.bar .sum small{display:block;font-family:var(--body);font-weight:600;font-size:13px;color:var(--muted)}
+.bar .btn{padding:11px 20px}
+@media (min-width:900px){.bar{display:none}}
+.spacer{height:90px}
+@media (min-width:900px){.spacer{height:0}}
+
+/* sections */
+section.block{padding:44px 0}
+h3{font-family:var(--display);font-weight:700;font-size:clamp(26px,4vw,38px);margin:0 0 18px;line-height:1.1}
+.orders{display:grid;gap:16px;grid-template-columns:1fr}
+@media (min-width:760px){.orders{grid-template-columns:1.3fr 1fr}}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:26px;padding:22px}
+.card.tilt{transform:rotate(-1.2deg)}
+.card p{margin:0 0 12px}
+.card .who{font-family:var(--display);font-weight:700;font-size:20px;margin-bottom:6px}
+.prizes{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:10px}
+.prizes li{display:flex;gap:12px;align-items:flex-start}
+.prizes .pl{flex:none;width:34px;height:34px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:15px;background:var(--soft)}
+.prizes li:first-child .pl{background:var(--pink);color:var(--pink-ink)}
+footer{padding:30px 0 40px;border-top:2px solid var(--line);margin-top:20px;display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between;align-items:center}
+footer p{margin:0;color:var(--muted);font-size:15px}
+footer nav{display:flex;gap:18px;flex-wrap:wrap;font-weight:700}
+.toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:700;font-size:15px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
+.toast.show{opacity:1}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+
+<header class="wrap hero">
+  <a class="brand" href="https://t.me/zharoffcockies" target="_blank" rel="noopener"><span class="dot" aria-hidden="true"></span>Mr Cookies</a>
+  <h1>Собери свой кукис</h1>
+  <p class="lede">Тимофей печёт, а ты решаешь, что будет внутри, сверху и прямо в тесте.</p>
+</header>
+
+<main class="wrap">
+  <div class="builder">
+    <div class="stage" aria-label="Превью кукиса">
+      <div class="plate"><svg id="cookie" viewBox="0 0 260 260" role="img" aria-label="Твой кукис"></svg></div>
+      <div class="stage-meta"><span class="nm" id="stageName">Medium</span><span class="wt" id="stageInfo">100 г</span></div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <h2><span class="n">1</span>Размер</h2>
+        <p class="hint">Цены уже со скидкой.</p>
+        <div class="sizes" id="sizes"></div>
+      </div>
+
+      <div class="step">
+        <h2><span class="n">2</span>Начинки и топпинги</h2>
+        <p class="hint">Каждая добавка <s>40</s> 29 ₽. Положить можно в тесто, внутрь или сверху.</p>
+        <div class="group-title">Тающие</div>
+        <div class="addons" id="fluid"></div>
+        <div class="group-title">Хрустящие</div>
+        <div class="addons" id="crunch"></div>
+      </div>
+
+      <div class="step">
+        <h2><span class="n">3</span>Сколько штук</h2>
+        <div class="qty">
+          <button type="button" id="minus" aria-label="Меньше">−</button>
+          <output id="qty" aria-live="polite">1</output>
+          <button type="button" id="plus" aria-label="Больше">+</button>
+        </div>
+      </div>
+
+      <div class="order" id="order">
+        <h2 style="font-family:var(--display);font-size:24px;margin:0 0 12px">Твой заказ</h2>
+        <pre id="orderText"></pre>
+        <div class="actions">
+          <a class="btn main" id="sendBtn" href="https://t.me/mrcookiestop" target="_blank" rel="noopener">Скопировать и написать Тимофею</a>
+        </div>
+        <p class="note">Текст заказа скопируется, останется вставить его в чат. Оплата через Сбер, детали пришлёт Тимофей.</p>
+      </div>
+    </div>
+  </div>
+
+  <section class="block" aria-labelledby="ordersT">
+    <h3 id="ordersT">Уже пекли</h3>
+    <div class="orders">
+      <div class="card tilt">
+        <div class="who">Заказ Никиты 🤙</div>
+        <p>Попкорн, карамель и нутелла. Хрустит снаружи, тянется внутри.</p>
+        <button class="btn" type="button" id="nikita">Собрать такой же</button>
+      </div>
+      <div class="card">
+        <div class="who">С запиской</div>
+        <p>В каждую упаковку Тимофей кладёт пожелание. Первые заказы уже у довольных клиентов.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="giveT">
+    <div class="card">
+      <h3 id="giveT">Розыгрыш на 60 подписчиков</h3>
+      <ul class="prizes">
+        <li><span class="pl">1</span><span>Три средних кукиса на выбор бесплатно</span></li>
+        <li><span class="pl">2</span><span>Один большой кукис на выбор бесплатно</span></li>
+        <li><span class="pl">3</span><span>Скидка 75% на следующий заказ</span></li>
+      </ul>
+      <p style="color:var(--muted);margin:0 0 16px">Ускорить можно: репостни канал, закинь в истории, расскажи друзьям.</p>
+      <a class="btn main" href="https://t.me/zharoffcockies" target="_blank" rel="noopener">Подписаться на канал</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>Mr Cookies. Тимофей любит готовить и делает это хорошо.</p>
+    <nav>
+      <a href="https://t.me/zharoffcockies" target="_blank" rel="noopener">Канал</a>
+      <a href="https://t.me/mrcookiesweet" target="_blank" rel="noopener">Меню</a>
+      <a href="https://t.me/mrcookiestop" target="_blank" rel="noopener">Заказать</a>
+    </nav>
+  </footer>
+  <div class="spacer"></div>
+</main>
+
+<div class="bar">
+  <div class="sum" id="barSum">99 ₽<small id="barSmall">Medium, без добавок</small></div>
+  <a class="btn main" href="#order">Заказать</a>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const SIZES=[
+  {id:'xs',name:'XS',g:70,old:70,price:59,r:62},
+  {id:'md',name:'Medium',g:100,old:110,price:99,r:84},
+  {id:'max',name:'Max',g:170,old:150,price:139,r:106}
+];
+const ADD=29;
+const ADDONS=[
+  {id:'choc',group:'fluid',name:'Silk Chocolate',desc:'тающий шоколад',color:'#4A2414'},
+  {id:'nutella',group:'fluid',name:'Creamy Nutella',desc:'нежная паста Nutella',color:'#7A4524'},
+  {id:'milk',group:'fluid',name:'Варёная сгущёнка',desc:'нежная и тягучая',color:'#B8692E'},
+  {id:'nuts',group:'crunch',name:'Nut Crunch',desc:'обжаренные орехи',color:'#C99A5B'},
+  {id:'drops',group:'crunch',name:'Choco Drops',desc:'шоколадные капли',color:'#3A1D10'},
+  {id:'caramel',group:'crunch',name:'Caramel Glass',desc:'осколки карамели',color:'#E9A33B'},
+  {id:'mm',group:'crunch',name:"Crispy M&M's",desc:'разноцветное драже',color:'conic-gradient(#E63946 0 25%,#2A9DF4 0 50%,#FFD23F 0 75%,#3BB273 0)'},
+  {id:'pop',group:'crunch',name:'Popcorn Crunch',desc:'хрустящий попкорн',color:'#FFF4DC'},
+  {id:'marsh',group:'crunch',name:'Soft Marshmallow',desc:'нежное маршмеллоу, только сверху',color:'#FFE3EA',only:'top'}
+];
+const PLACES={dough:'в тесто',inside:'внутрь',top:'сверху'};
+const state={size:'md',qty:1,addons:{}};
+
+const $=s=>document.querySelector(s);
+const sizeOf=()=>SIZES.find(s=>s.id===state.size);
+
+function renderSizes(){
+  $('#sizes').innerHTML=SIZES.map(s=>`
+    <button type="button" class="size" data-size="${s.id}" aria-pressed="${s.id===state.size}">
+      <span class="sz">${s.name}</span><span class="g">${s.g} г</span>
+      <span class="pr">${s.old!==s.price?`<s>${s.old}</s>`:''}${s.price} ₽</span>
+    </button>`).join('');
+}
+function renderAddons(){
+  ['fluid','crunch'].forEach(g=>{
+    $('#'+g).innerHTML=ADDONS.filter(a=>a.group===g).map(a=>{
+      const on=a.id in state.addons, pl=state.addons[a.id];
+      const places=a.only?[a.only]:Object.keys(PLACES);
+      return `<div class="addon${on?' on':''}" data-id="${a.id}">
+        <button type="button" class="addon-btn" aria-pressed="${on}">
+          <span class="sw" style="background:${a.color}"></span>
+          <span class="addon-txt"><b>${a.name}</b><span>${a.desc}</span></span>
+          <span class="tick" aria-hidden="true">${on?'✓':''}</span>
+        </button>
+        <div class="place" role="group" aria-label="Куда положить">
+          ${places.map(p=>`<button type="button" data-place="${p}" aria-pressed="${pl===p}">${PLACES[p]}</button>`).join('')}
+        </div></div>`;
+    }).join('');
+  });
+}
+
+/* ---------- cookie drawing ---------- */
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function hash(s){let h=2166136261;for(const c of s)h=Math.imul(h^c.charCodeAt(0),16777619);return h}
+function blobPath(cx,cy,r,seed,n=40,j=.05){
+  const R=rng(seed);let d='';
+  for(let i=0;i<=n;i++){const a=i/n*Math.PI*2;const rr=r*(1+Math.sin(a*5+seed%7)*.025+(R()-.5)*j);
+    const x=cx+Math.cos(a)*rr,y=cy+Math.sin(a)*rr;d+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)}
+  return d+'Z';
+}
+function pts(count,r,seed,cx=130,cy=130,avoid){
+  const R=rng(seed),out=[];let tries=0;
+  while(out.length<count&&tries<400){tries++;
+    const a=R()*Math.PI*2,d=Math.sqrt(R())*r;const x=cx+Math.cos(a)*d,y=cy+Math.sin(a)*d;
+    if(avoid&&Math.hypot(x-avoid.x,y-avoid.y)<avoid.r)continue;
+    out.push({x,y,rot:R()*360,k:R()});}
+  return out;
+}
+const MM=['#E63946','#2A9DF4','#FFD23F','#3BB273','#F77F00','#8E44AD'];
+function piece(id,p,s=1){
+  const t=`transform="translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) rotate(${p.rot.toFixed(0)}) scale(${s})"`;
+  switch(id){
+    case 'drops':return `<path ${t} d="M0 -7 C4 -2 6 2 0 6 C-6 2 -4 -2 0 -7Z" fill="#3A1D10"/>`;
+    case 'nuts':return `<g ${t}><ellipse rx="7" ry="5" fill="#D7AA6B" stroke="#8E6030" stroke-width="1.2"/><path d="M-4 0 Q0 -3 4 0" stroke="#8E6030" fill="none" stroke-width="1"/></g>`;
+    case 'caramel':return `<g ${t}><path d="M-6 5 L1 -8 L7 4Z" fill="#E9A33B" stroke="#B5701A" stroke-width="1"/><path d="M-1 1 L1 -4" stroke="#FFE2A6" stroke-width="1.5" stroke-linecap="round"/></g>`;
+    case 'mm':return `<g ${t}><ellipse rx="6.5" ry="5.5" fill="${MM[Math.floor(p.k*MM.length)]}" stroke="rgba(0,0,0,.25)"/><ellipse cx="-2" cy="-2" rx="2" ry="1.2" fill="rgba(255,255,255,.55)"/></g>`;
+    case 'pop':return `<g ${t} fill="#FFF6E2" stroke="#DCC08A" stroke-width="1"><circle cx="-3" cy="0" r="5"/><circle cx="3" cy="-2" r="5"/><circle cx="1" cy="4" r="4.5"/></g>`;
+    case 'marsh':return `<rect ${t} x="-7" y="-7" width="14" height="14" rx="5" fill="#FFFFFF" stroke="#F2B8C8" stroke-width="1.5"/>`;
+  }
+  return '';
+}
+function drawCookie(){
+  const s=sizeOf(),r=s.r,cx=130,cy=130;
+  const A=state.addons,ids=Object.keys(A);
+  const seed=hash(state.size+'|'+ids.sort().map(k=>k+A[k]).join(','));
+  const hasInside=ids.some(k=>A[k]==='inside');
+  const bite={x:cx+r*.72,y:cy-r*.72,r:r*.42};
+  const fluidInside=ids.filter(k=>A[k]==='inside'&&ADDONS.find(a=>a.id===k).group==='fluid');
+  const crunchInside=ids.filter(k=>A[k]==='inside'&&ADDONS.find(a=>a.id===k).group==='crunch');
+  let g='';
+  g+=`<defs><clipPath id="cl"><path d="${blobPath(cx,cy,r,seed&255)}"/></clipPath>
+      <mask id="bm"><rect width="260" height="260" fill="#fff"/>${hasInside?`
+        <circle cx="${bite.x}" cy="${bite.y}" r="${bite.r}" fill="#000"/>
+        <circle cx="${bite.x-bite.r*.75}" cy="${bite.y-bite.r*.25}" r="${bite.r*.38}" fill="#000"/>
+        <circle cx="${bite.x+bite.r*.25}" cy="${bite.y+bite.r*.75}" r="${bite.r*.38}" fill="#000"/>`:''}</mask></defs>`;
+  // shadow
+  g+=`<ellipse cx="${cx+6}" cy="${cy+r*.92}" rx="${r*.95}" ry="${r*.16}" fill="rgba(58,30,18,.15)"/>`;
+  // inside (visible through bite)
+  if(hasInside){
+    const inner=r*.86;
+    g+=`<g clip-path="url(#cl)"><circle cx="${cx}" cy="${cy}" r="${inner}" fill="#B87A3C"/>`;
+    fluidInside.forEach((k,i)=>{const col=ADDONS.find(a=>a.id===k).color;
+      g+=`<path d="${blobPath(bite.x-bite.r*.35,bite.y+bite.r*.3,bite.r*(.95-i*.18),seed+i,24,.25)}" fill="${col}"/>`});
+    crunchInside.forEach((k,i)=>pts(5,bite.r*.7,seed+50+i,bite.x-bite.r*.3,bite.y+bite.r*.3).forEach(p=>g+=piece(k,p,.9)));
+    g+=`</g>`;
+  }
+  // cookie body
+  g+=`<g mask="url(#bm)"><path d="${blobPath(cx,cy,r,seed&255)}" fill="#E3A55A" stroke="#C47F38" stroke-width="3"/>`;
+  g+=`<g clip-path="url(#cl)">`;
+  // dough texture
+  pts(Math.round(r/3),r*.9,seed+3).forEach(p=>g+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${(1+p.k*2).toFixed(1)}" fill="#C88A44" opacity=".55"/>`);
+  g+=`<path d="${blobPath(cx-r*.08,cy-r*.08,r*.82,seed+9,30,.08)}" fill="none" stroke="#F2C27E" stroke-width="5" opacity=".45"/>`;
+  // in dough
+  ids.filter(k=>A[k]==='dough').forEach((k,i)=>{
+    const a=ADDONS.find(x=>x.id===k);
+    if(a.group==='fluid'){
+      const R=rng(seed+100+i);
+      for(let j=0;j<4;j++){const y=cy-r+R()*r*2;
+        g+=`<path d="M${cx-r} ${y.toFixed(1)} C${cx-r/3} ${(y-18+R()*36).toFixed(1)} ${cx+r/3} ${(y-18+R()*36).toFixed(1)} ${cx+r} ${(y+R()*20-10).toFixed(1)}" stroke="${a.color}" stroke-width="${(5+R()*5).toFixed(1)}" fill="none" opacity=".45" stroke-linecap="round"/>`;}
+    } else pts(7,r*.85,seed+200+i,cx,cy,hasInside?bite:null).forEach(p=>g+=`<g opacity=".55">${piece(k,p,.75)}</g>`);
+  });
+  g+=`</g></g>`;
+  // ooze from bite edge
+  if(fluidInside.length){const col=ADDONS.find(a=>a.id===fluidInside[0]).color;
+    const x=bite.x-bite.r*.55,y=bite.y+bite.r*.72;
+    g+=`<path d="M${x-10} ${y} Q${x-12} ${y+22} ${x-4} ${y+26} Q${x+4} ${y+28} ${x+4} ${y+12} Q${x+8} ${y} ${x+14} ${y-4}Z" fill="${col}"/>`;}
+  // on top
+  ids.filter(k=>A[k]==='top').forEach((k,i)=>{
+    const a=ADDONS.find(x=>x.id===k);
+    if(a.group==='fluid'){
+      const R=rng(seed+300+i);let d='';const n=7;
+      for(let j=0;j<=n;j++){const x=cx-r*.8+j*(r*1.6/n);const y=cy-r*.55+(j%2?r*1.1:0)+(R()-.5)*r*.15+i*8;d+=(j?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)}
+      g+=`<path d="${d}" stroke="${a.color}" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" mask="url(#bm)" clip-path="url(#cl)"/>`;
+    } else pts(k==='marsh'?6:9,r*.78,seed+400+i,cx,cy,hasInside?bite:null).forEach(p=>g+=piece(k,p));
+  });
+  const svg=$('#cookie');
+  svg.innerHTML=`<g class="c">${g}</g>`;
+  const c=svg.querySelector('.c');requestAnimationFrame(()=>c.classList.add('pop'));
+}
+
+/* ---------- totals & order ---------- */
+function total(){return (sizeOf().price+Object.keys(state.addons).length*ADD)*state.qty}
+function orderText(){
+  const s=sizeOf(),ids=Object.keys(state.addons);
+  let t=`Привет! Хочу заказать кукис 🍪\nРазмер: ${s.name} (${s.g} г) × ${state.qty}\n`;
+  t+=ids.length?'Добавки:\n'+ids.map(k=>`— ${ADDONS.find(a=>a.id===k).name}: ${PLACES[state.addons[k]]}`).join('\n'):'Без добавок';
+  t+=`\nИтого: ${total()} ₽`;
+  return t;
+}
+function update(){
+  const s=sizeOf(),n=Object.keys(state.addons).length;
+  $('#stageName').textContent=s.name;
+  $('#stageInfo').textContent=`${s.g} г${n?`, добавок: ${n}`:''}`;
+  $('#qty').textContent=state.qty;
+  $('#orderText').textContent=orderText();
+  $('#barSum').firstChild.nodeValue=total()+' ₽';
+  $('#barSmall').textContent=`${s.name}${state.qty>1?' × '+state.qty:''}, ${n?'добавок: '+n:'без добавок'}`;
+  drawCookie();
+}
+function all(){renderSizes();renderAddons();update()}
+
+$('#sizes').addEventListener('click',e=>{const b=e.target.closest('[data-size]');if(!b)return;state.size=b.dataset.size;renderSizes();update()});
+document.querySelectorAll('.addons').forEach(box=>box.addEventListener('click',e=>{
+  const card=e.target.closest('.addon');if(!card)return;const id=card.dataset.id,a=ADDONS.find(x=>x.id===id);
+  const pb=e.target.closest('[data-place]');
+  if(pb){state.addons[id]=pb.dataset.place}
+  else if(e.target.closest('.addon-btn')){ if(id in state.addons) delete state.addons[id]; else state.addons[id]=a.only||(a.group==='fluid'?'inside':'top'); }
+  else return;
+  renderAddons();update();
+  const again=document.querySelector(`.addon[data-id="${id}"] .addon-btn`);if(again&&!pb)again.focus();
+  if(pb){const f=document.querySelector(`.addon[data-id="${id}"] [data-place="${pb.dataset.place}"]`);f&&f.focus()}
+}));
+$('#minus').onclick=()=>{if(state.qty>1){state.qty--;update()}};
+$('#plus').onclick=()=>{if(state.qty<30){state.qty++;update()}};
+$('#nikita').onclick=()=>{state.addons={pop:'top',caramel:'top',nutella:'inside'};all();
+  document.querySelector('.stage').scrollIntoView({block:'start'});toast('Собрали как у Никиты')};
+
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2200)}
+$('#sendBtn').addEventListener('click',()=>{
+  const txt=orderText();
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(()=>toast('Заказ скопирован'),()=>fallbackCopy(txt))}
+    else fallbackCopy(txt);
+  }catch(e){fallbackCopy(txt)}
+});
+function fallbackCopy(txt){
+  try{const ta=document.createElement('textarea');ta.value=txt;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+    const ok=document.execCommand('copy');ta.remove();toast(ok?'Заказ скопирован':'Скопируй текст заказа вручную')}
+  catch(e){toast('Скопируй текст заказа вручную')}
+}
+all();
+</script>
+</body>
+</html>
